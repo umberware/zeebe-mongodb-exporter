@@ -36,7 +36,7 @@ zeebe:
         readOnlyRootFilesystem: false
     initContainers:
         - name: init-mongodb-exporter
-          image: busybox:1.35
+          image: busybox:1.36
           command: [ '/bin/sh', '-c' ]
           gargs: [ 'wget --no-check-certificate "https://github.com/umberware/zeebe-mongodb-exporter/releases/download/8.3.1/zeebe-mongodb-exporter-8.3.1.jar" -O /exporters/zeebe-mongodb-exporter.jar;']
           volumeMounts:
