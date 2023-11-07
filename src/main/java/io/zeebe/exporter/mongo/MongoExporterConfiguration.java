@@ -207,7 +207,6 @@ public class MongoExporterConfiguration {
         public boolean processMessageSubscription = true;
         public boolean variable = true;
         public boolean variableDocument = true;
-
         public boolean checkpoint = false;
         public boolean timer = true;
         public boolean messageStartEventSubscription = true;
