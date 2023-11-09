@@ -20,139 +20,57 @@ public class MongoExporterConfiguration {
     }
 
     public boolean shouldExportRecord(RecordType recordType, ValueType valueType) {
-        return this.shouldExportEventType(recordType)
-                && this.shouldExportRecordType(valueType);
+        return this.shouldExportRecordType(recordType)
+                && this.shouldExportEventType(valueType);
     }
 
-    public boolean shouldExportRecordType(final ValueType valueType) {
-        switch (valueType) {
-            case DEPLOYMENT:
-                return data.deployment;
-            case PROCESS:
-                return data.process;
-            case ERROR:
-                return data.error;
-            case INCIDENT:
-                return data.incident;
-            case JOB:
-                return data.job;
-            case JOB_BATCH:
-                return data.jobBatch;
-            case MESSAGE:
-                return data.message;
-            case MESSAGE_BATCH:
-                return data.messageBatch;
-            case MESSAGE_SUBSCRIPTION:
-                return data.messageSubscription;
-            case VARIABLE:
-                return data.variable;
-            case VARIABLE_DOCUMENT:
-                return data.variableDocument;
-            case PROCESS_INSTANCE:
-                return data.processInstance;
-            case PROCESS_INSTANCE_BATCH:
-                return data.processInstanceBatch;
-            case PROCESS_INSTANCE_CREATION:
-                return data.processInstanceCreation;
-            case PROCESS_INSTANCE_MODIFICATION:
-                return data.processInstanceModification;
-            case PROCESS_MESSAGE_SUBSCRIPTION:
-                return data.processMessageSubscription;
-            case DECISION_REQUIREMENTS:
-                return data.decisionRequirements;
-            case DECISION:
-                return data.decision;
-            case DECISION_EVALUATION:
-                return data.decisionEvaluation;
-            case CHECKPOINT:
-                return data.checkpoint;
-            case TIMER:
-                return data.timer;
-            case MESSAGE_START_EVENT_SUBSCRIPTION:
-                return data.messageStartEventSubscription;
-            case PROCESS_EVENT:
-                return data.processEvent;
-            case DEPLOYMENT_DISTRIBUTION:
-                return data.deploymentDistribution;
-            case ESCALATION:
-                return data.escalation;
-            case SIGNAL:
-                return data.signal;
-            case SIGNAL_SUBSCRIPTION:
-                return data.signalSubscription;
-            case RESOURCE_DELETION:
-                return data.resourceDeletion;
-            case COMMAND_DISTRIBUTION:
-                return data.commandDistribution;
-            case FORM:
-                return data.form;
-            default:
-                return false;
-        }
+    public boolean shouldExportEventType(final ValueType valueType) {
+        return switch (valueType) {
+            case DEPLOYMENT -> data.deployment;
+            case PROCESS -> data.process;
+            case ERROR -> data.error;
+            case INCIDENT -> data.incident;
+            case JOB -> data.job;
+            case JOB_BATCH -> data.jobBatch;
+            case MESSAGE -> data.message;
+            case MESSAGE_BATCH -> data.messageBatch;
+            case MESSAGE_SUBSCRIPTION -> data.messageSubscription;
+            case VARIABLE -> data.variable;
+            case VARIABLE_DOCUMENT -> data.variableDocument;
+            case PROCESS_INSTANCE -> data.processInstance;
+            case PROCESS_INSTANCE_BATCH -> data.processInstanceBatch;
+            case PROCESS_INSTANCE_CREATION -> data.processInstanceCreation;
+            case PROCESS_INSTANCE_MODIFICATION -> data.processInstanceModification;
+            case PROCESS_MESSAGE_SUBSCRIPTION -> data.processMessageSubscription;
+            case DECISION_REQUIREMENTS -> data.decisionRequirements;
+            case DECISION -> data.decision;
+            case DECISION_EVALUATION -> data.decisionEvaluation;
+            case CHECKPOINT -> data.checkpoint;
+            case TIMER -> data.timer;
+            case MESSAGE_START_EVENT_SUBSCRIPTION -> data.messageStartEventSubscription;
+            case PROCESS_EVENT -> data.processEvent;
+            case DEPLOYMENT_DISTRIBUTION -> data.deploymentDistribution;
+            case ESCALATION -> data.escalation;
+            case SIGNAL -> data.signal;
+            case SIGNAL_SUBSCRIPTION -> data.signalSubscription;
+            case RESOURCE_DELETION -> data.resourceDeletion;
+            case COMMAND_DISTRIBUTION -> data.commandDistribution;
+            case FORM -> data.form;
+            default -> false;
+        };
     }
 
-    public boolean shouldExportEventType(final RecordType recordType) {
-        switch (recordType) {
-            case EVENT:
-                return dataType.event;
-            case COMMAND:
-                return dataType.command;
-            case COMMAND_REJECTION:
-                return dataType.rejection;
-            default:
-                return false;
-        }
+    public boolean shouldExportRecordType(final RecordType recordType) {
+        return switch (recordType) {
+            case EVENT -> dataType.event;
+            case COMMAND -> dataType.command;
+            case COMMAND_REJECTION -> dataType.rejection;
+            default -> false;
+        };
     }
 
-    public String getCollectionNameByEvent(ValueType intent) {
-        switch (intent) {
-            case DEPLOYMENT:
-                return "deployment";
-            case INCIDENT:
-                return "incident";
-            case JOB:
-                return "job";
-            case PROCESS_INSTANCE:
-                return "process-instance";
-            case MESSAGE:
-                return "message";
-            case MESSAGE_SUBSCRIPTION:
-                return "message-subscription";
-            case MESSAGE_START_EVENT_SUBSCRIPTION:
-                return "message-star-event-subscription";
-            case PROCESS_MESSAGE_SUBSCRIPTION:
-                return "process-message-subscription";
-            case JOB_BATCH:
-                return "job-batch";
-            case TIMER:
-                return "timer";
-            case VARIABLE:
-                return "variable";
-            case VARIABLE_DOCUMENT:
-                return "variable-document";
-            case PROCESS_INSTANCE_CREATION:
-                return "process-instance-creation";
-            case ERROR:
-                return "error";
-            case PROCESS:
-                return "process";
-            case DEPLOYMENT_DISTRIBUTION:
-                return "deployment-distribution";
-            case PROCESS_EVENT:
-                return "process-event";
-            case DECISION:
-                return "decision";
-            case DECISION_REQUIREMENTS:
-                return "decision-requirements";
-            case DECISION_EVALUATION:
-                return "decision-evaluation";
-            case CHECKPOINT:
-                return "checkpoint";
-            case PROCESS_INSTANCE_MODIFICATION:
-                return "process-instance-modification";
-            default:
-                return null;
-        }
+    public String getCollectionNameByEvent(ValueType valueType) {
+        return valueType.toString().replaceAll("_", "-").toLowerCase();
     }
 
     public static class ConnectionConfiguration {

@@ -1,5 +1,9 @@
 package io.zeebe.exporter.mongo;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.camunda.zeebe.exporter.api.Exporter;
 import io.camunda.zeebe.exporter.api.context.Context;
 import io.camunda.zeebe.exporter.api.context.Controller;
@@ -7,8 +11,12 @@ import io.camunda.zeebe.protocol.record.Record;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 public class MongoExporter implements Exporter {
     private Logger logger = LoggerFactory.getLogger(getClass().getPackageName());
+    private final ObjectMapper exporterBuilder = new ObjectMapper();
+
     protected MongoExporterConfiguration exporterConfiguration;
     protected MongoExporterClient exporterClient;
 
@@ -37,10 +45,20 @@ public class MongoExporter implements Exporter {
 
     @Override
     public void export(Record<?> record) {
-        String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType());
+        if (this.exporterConfiguration.shouldExportRecord(record.getRecordType(), record.getValueType())) {
+            try {
+                String recordAsJson = this.exporterBuilder.writeValueAsString(record.getValue());
+                String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType());
+                Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String,Object>>(){});
+                recordAsMap.put("intent", record.getIntent());
+                recordAsMap.put("recordType", record.getRecordType());
+                recordAsMap.put("valueType", record.getRecordType());
 
-        if (this.exporterConfiguration.shouldExportRecord(record.getRecordType(), record.getValueType()) && collection != null) {
-            this.exporterClient.insertRecord(collection, record.getValue().toJson());
+                this.exporterClient.insertRecord(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
+            } catch (JsonProcessingException e) {
+                this.logger.info("MongoExporter: Error when converting object: " + record.getValueType() + ":" + record.getRecordType());
+                throw new RuntimeException(e);
+            }
         } else {
             this.logger.info("MongoExporter: Will not be exported: " + record.getValueType() + ":" + record.getRecordType());
         }

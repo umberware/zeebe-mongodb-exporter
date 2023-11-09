@@ -14,11 +14,11 @@ public class MongoExporterFilter implements Context.RecordFilter {
 
     @Override
     public boolean acceptType(final RecordType recordType) {
-        return configuration.shouldExportEventType(recordType);
+        return configuration.shouldExportRecordType(recordType);
     }
 
     @Override
     public boolean acceptValue(final ValueType valueType) {
-        return configuration.shouldExportRecordType(valueType);
+        return configuration.shouldExportEventType(valueType);
     }
 }
