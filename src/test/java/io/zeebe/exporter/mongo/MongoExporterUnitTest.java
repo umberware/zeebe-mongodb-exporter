@@ -46,7 +46,7 @@ public class MongoExporterUnitTest {
         Map<String, Object> recordAsMap = mapper.readValue(expectedRecordAsJson, new TypeReference<Map<String,Object>>(){});
         recordAsMap.put("intent", record.getIntent());
         recordAsMap.put("recordType", record.getRecordType());
-        recordAsMap.put("valueType", record.getRecordType());
+        recordAsMap.put("valueType", record.getValueType());
 
         exporter.export(record);
 

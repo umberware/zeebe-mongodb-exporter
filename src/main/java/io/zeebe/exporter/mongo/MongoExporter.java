@@ -52,7 +52,7 @@ public class MongoExporter implements Exporter {
                 Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String,Object>>(){});
                 recordAsMap.put("intent", record.getIntent());
                 recordAsMap.put("recordType", record.getRecordType());
-                recordAsMap.put("valueType", record.getRecordType());
+                recordAsMap.put("valueType", record.getValueType());
 
                 this.exporterClient.insertRecord(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
             } catch (JsonProcessingException e) {
