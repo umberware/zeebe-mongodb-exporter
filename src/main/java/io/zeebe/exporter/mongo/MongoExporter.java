@@ -54,6 +54,8 @@ public class MongoExporter implements Exporter {
                 recordAsMap.put("recordType", record.getRecordType());
                 recordAsMap.put("valueType", record.getValueType());
                 recordAsMap.put("timestamp", record.getTimestamp());
+                recordAsMap.put("key", record.getKey());
+                recordAsMap.put("position", record.getPosition());
 
                 this.exporterClient.insertRecord(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
             } catch (JsonProcessingException e) {

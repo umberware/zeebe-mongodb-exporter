@@ -48,6 +48,8 @@ public class MongoExporterUnitTest {
         recordAsMap.put("recordType", record.getRecordType());
         recordAsMap.put("valueType", record.getValueType());
         recordAsMap.put("timestamp", record.getTimestamp());
+        recordAsMap.put("key", record.getKey());
+        recordAsMap.put("position", record.getPosition());
 
         exporter.export(record);
 
@@ -74,7 +76,9 @@ public class MongoExporterUnitTest {
             .withRecordType(type)
             .withValueType(eventType)
             .withValue(recordValue)
-            .withTimestamp(111112222)
+            .withTimestamp(1234567)
+            .withKey(12345)
+            .withPosition(123456)
             .build();
     }
 
