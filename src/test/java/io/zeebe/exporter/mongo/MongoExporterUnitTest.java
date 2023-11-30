@@ -3,6 +3,7 @@ package io.zeebe.exporter.mongo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.camunda.zeebe.exporter.api.context.Controller;
 import io.camunda.zeebe.protocol.record.*;
 import io.camunda.zeebe.protocol.record.intent.DeploymentIntent;
 import io.camunda.zeebe.protocol.record.value.ImmutableProcessInstanceCreationRecordValue;
@@ -22,15 +23,19 @@ public class MongoExporterUnitTest {
     private MongoExporterClient exporterClient;
     private MongoExporterConfiguration exporterConfiguration;
 
+    private Controller controller;
+
     @Spy private MongoExporter exporter;
 
     @BeforeEach()
     public void prepare() {
         this.exporterConfiguration = spy(MongoExporterConfiguration.class);
         this.exporterClient = mock(MongoExporterClient.class);
+        this.controller = mock(Controller.class);
 
         this.exporter.exporterConfiguration = this.exporterConfiguration;
         this.exporter.exporterClient = this.exporterClient;
+        this.exporter.controller = this.controller;
     }
 
     @Test
@@ -39,7 +44,9 @@ public class MongoExporterUnitTest {
 
         variables.put("game", "Cyberpunk 2077");
 
-        ImmutableRecord<RecordValue> record = this.buildRecord(this.buildProcessInstanceCreationRecordValue(variables), RecordType.EVENT, ValueType.PROCESS_INSTANCE);
+        ImmutableRecord<RecordValue> record = this.buildRecord(this.buildProcessInstanceCreationRecordValue(variables), RecordType.EVENT, ValueType.PROCESS_INSTANCE, 3
+
+        );
         ObjectMapper mapper = new ObjectMapper();
 
         String expectedRecordAsJson = mapper.writeValueAsString(record.getValue());
@@ -60,7 +67,7 @@ public class MongoExporterUnitTest {
 
     @Test
     public void recordNotExportable() throws JsonProcessingException {
-        ImmutableRecord<RecordValue> record = this.buildRecord(null, RecordType.EVENT, ValueType.JOB_BATCH);
+        ImmutableRecord<RecordValue> record = this.buildRecord(null, RecordType.EVENT, ValueType.JOB_BATCH, 1);
 
         exporter.export(record);
 
@@ -70,10 +77,11 @@ public class MongoExporterUnitTest {
         verify(this.exporterClient, times(0)).insertRecord(anyString(), any());
     }
 
-    protected ImmutableRecord<RecordValue> buildRecord(RecordValue recordValue, RecordType type, ValueType eventType) {
+    protected ImmutableRecord<RecordValue> buildRecord(RecordValue recordValue, RecordType type, ValueType eventType, long position) {
         return ImmutableRecord.builder()
             .withIntent(DeploymentIntent.from((short) 0))
             .withRecordType(type)
+            .withPosition(position)
             .withValueType(eventType)
             .withValue(recordValue)
             .withTimestamp(1234567)
