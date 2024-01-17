@@ -14,7 +14,7 @@ public class MongoExporterConfiguration {
     public DataTypeConfiguration dataType = new DataTypeConfiguration();
     public DataConfiguration data = new DataConfiguration();
 
-    public LoggerConfiguration loggerConfiguration = new LoggerConfiguration();
+    public LoggerConfiguration logger = new LoggerConfiguration();
 
     public void initialize() {
         this.mongoClient = MongoClients.create(connection.uri);
@@ -71,8 +71,8 @@ public class MongoExporterConfiguration {
         };
     }
 
-    public boolean isDebugAllowed() {
-        return this.loggerConfiguration.debug;
+    public LoggerConfiguration getLogger() {
+        return this.logger;
     }
 
     public String getCollectionNameByEvent(ValueType valueType) {
@@ -96,12 +96,12 @@ public class MongoExporterConfiguration {
     }
 
     public static class LoggerConfiguration {
-        public boolean debug = false;
+        public MongoExporterLoggerLevel level = MongoExporterLoggerLevel.INFO;
         @Override
         public String toString() {
             return "LoggerConfiguration{"
-                    + "debug="
-                    + debug
+                    + "level="
+                    + level
                     + "}";
         }
     }

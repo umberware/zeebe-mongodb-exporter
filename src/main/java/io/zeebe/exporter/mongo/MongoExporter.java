@@ -7,13 +7,11 @@ import io.camunda.zeebe.exporter.api.Exporter;
 import io.camunda.zeebe.exporter.api.context.Context;
 import io.camunda.zeebe.exporter.api.context.Controller;
 import io.camunda.zeebe.protocol.record.Record;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class MongoExporter implements Exporter {
-    private Logger logger = LoggerFactory.getLogger(getClass().getPackageName());
+    private final MongoExporterLogger logger = new MongoExporterLogger();
     private final ObjectMapper exporterBuilder = new ObjectMapper();
     protected Controller controller;
     private long lastPosition = -1;
@@ -22,10 +20,11 @@ public class MongoExporter implements Exporter {
 
     @Override
     public void configure(Context context) {
-        this.logger = context.getLogger();
         this.logger.info("MongoExporter: Configuring the exporter...");
         this.exporterConfiguration = context.getConfiguration().instantiate(MongoExporterConfiguration.class);
+        this.logger.setLoggerConfiguration(this.exporterConfiguration.getLogger());
         context.setFilter(new MongoExporterFilter(this.exporterConfiguration));
+        this.logger.info("Logger configuration: " + this.exporterConfiguration.logger.toString());
         this.logger.info("Data allowed to be exported: " + this.exporterConfiguration.data.toString());
         this.logger.info("Event Data allowed to be exported: " + this.exporterConfiguration.dataType.toString());
         this.logger.info("MongoExporter: Configured.");
