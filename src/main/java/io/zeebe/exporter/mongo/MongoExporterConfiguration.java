@@ -14,6 +14,8 @@ public class MongoExporterConfiguration {
     public DataTypeConfiguration dataType = new DataTypeConfiguration();
     public DataConfiguration data = new DataConfiguration();
 
+    public LoggerConfiguration loggerConfiguration = new LoggerConfiguration();
+
     public void initialize() {
         this.mongoClient = MongoClients.create(connection.uri);
         this.mongoDatabase = this.mongoClient.getDatabase(connection.database);
@@ -69,6 +71,10 @@ public class MongoExporterConfiguration {
         };
     }
 
+    public boolean isDebugAllowed() {
+        return this.loggerConfiguration.debug;
+    }
+
     public String getCollectionNameByEvent(ValueType valueType) {
         return valueType.toString().replaceAll("_", "-").toLowerCase();
     }
@@ -87,6 +93,17 @@ public class MongoExporterConfiguration {
                     + "}";
         }
 
+    }
+
+    public static class LoggerConfiguration {
+        public boolean debug = false;
+        @Override
+        public String toString() {
+            return "LoggerConfiguration{"
+                    + "debug="
+                    + debug
+                    + "}";
+        }
     }
 
     public static class DataTypeConfiguration {

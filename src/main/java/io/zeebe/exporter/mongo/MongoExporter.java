@@ -26,6 +26,8 @@ public class MongoExporter implements Exporter {
         this.logger.info("MongoExporter: Configuring the exporter...");
         this.exporterConfiguration = context.getConfiguration().instantiate(MongoExporterConfiguration.class);
         context.setFilter(new MongoExporterFilter(this.exporterConfiguration));
+        this.logger.info("Data allowed to be exported: " + this.exporterConfiguration.data.toString());
+        this.logger.info("Event Data allowed to be exported: " + this.exporterConfiguration.dataType.toString());
         this.logger.info("MongoExporter: Configured.");
     }
 
@@ -47,12 +49,12 @@ public class MongoExporter implements Exporter {
     @Override
     public void export(Record<?> record) {
         long actualPosition = record.getPosition();
+        this.logger.debug("Record position: " + record.getPosition() + "\nRecord: " + record.toString());
         if (this.canBeExported(record, actualPosition)) {
             try {
                 String recordAsJson = this.exporterBuilder.writeValueAsString(record.getValue());
                 String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType());
-                Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String, Object>>() {
-                });
+                Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String, Object>>() {});
                 recordAsMap.put("intent", record.getIntent());
                 recordAsMap.put("recordType", record.getRecordType());
                 recordAsMap.put("valueType", record.getValueType());
