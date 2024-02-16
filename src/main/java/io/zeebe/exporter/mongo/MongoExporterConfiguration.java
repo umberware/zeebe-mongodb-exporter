@@ -83,6 +83,8 @@ public class MongoExporterConfiguration {
             BpmnElementType elementType = ((ProcessInstanceRecordValue) value).getBpmnElementType();
             if (elementType == BpmnElementType.PROCESS) {
                 return "process-instance";
+            } else if (elementType == BpmnElementType.SEQUENCE_FLOW) {
+                return "process-instance-sequence-flow";
             } else {
                 return "process-instance-element";
             }

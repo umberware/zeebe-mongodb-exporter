@@ -93,6 +93,31 @@ public class MongoExporterUnitTest {
     }
 
     @Test
+    public void processInstanceSequenceFlowRecord() throws JsonProcessingException {
+        RecordValue recordValue = this.buildProcessInstanceRecordValue(BpmnElementType.SEQUENCE_FLOW);
+        ImmutableRecord<RecordValue> record = this.buildRecord(recordValue, RecordType.EVENT, ValueType.PROCESS_INSTANCE, 3);
+        ObjectMapper mapper = new ObjectMapper();
+
+        String expectedRecordAsJson = mapper.writeValueAsString(record.getValue());
+        Map<String, Object> recordAsMap = mapper.readValue(expectedRecordAsJson, new TypeReference<Map<String,Object>>(){});
+        recordAsMap.put("intent", record.getIntent());
+        recordAsMap.put("recordType", record.getRecordType());
+        recordAsMap.put("valueType", record.getValueType());
+        recordAsMap.put("timestamp", record.getTimestamp());
+        recordAsMap.put("key", record.getKey());
+        recordAsMap.put("position", record.getPosition());
+
+        exporter.export(record);
+
+        verify(this.exporterConfiguration).shouldExportEventType(record.getValueType());
+        verify(this.exporterConfiguration).shouldExportRecordType(record.getRecordType());
+        verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), eq(recordValue));
+        verify(this.exporterClient).insertRecord("process-instance-sequence-flow", mapper.writeValueAsString(recordAsMap));
+        verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), eq(recordValue));
+        assertEquals("process-instance-sequence-flow", this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), recordValue));
+    }
+
+    @Test
     public void processInstanceElementRecord() throws JsonProcessingException {
         Map<String, Object> variables = new HashMap<>();
 
