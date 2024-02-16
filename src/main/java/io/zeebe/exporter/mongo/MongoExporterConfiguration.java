@@ -4,7 +4,10 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import io.camunda.zeebe.protocol.record.RecordType;
+import io.camunda.zeebe.protocol.record.RecordValue;
 import io.camunda.zeebe.protocol.record.ValueType;
+import io.camunda.zeebe.protocol.record.value.BpmnElementType;
+import io.camunda.zeebe.protocol.record.value.ProcessInstanceRecordValue;
 
 public class MongoExporterConfiguration {
     MongoClient mongoClient;
@@ -75,8 +78,17 @@ public class MongoExporterConfiguration {
         return this.logger;
     }
 
-    public String getCollectionNameByEvent(ValueType valueType) {
-        return valueType.toString().replaceAll("_", "-").toLowerCase();
+    public String getCollectionNameByEvent(ValueType valueType, RecordValue  value) {
+        if (valueType == ValueType.PROCESS_INSTANCE) {
+            BpmnElementType elementType = ((ProcessInstanceRecordValue) value).getBpmnElementType();
+            if (elementType == BpmnElementType.PROCESS) {
+                return "process-instance";
+            } else {
+                return "process-instance-element";
+            }
+        } else {
+            return valueType.toString().replaceAll("_", "-").toLowerCase();
+        }
     }
 
     public static class ConnectionConfiguration {

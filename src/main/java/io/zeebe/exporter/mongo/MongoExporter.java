@@ -52,7 +52,7 @@ public class MongoExporter implements Exporter {
         if (this.canBeExported(record, actualPosition)) {
             try {
                 String recordAsJson = this.exporterBuilder.writeValueAsString(record.getValue());
-                String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType());
+                String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), record.getValue());
                 Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String, Object>>() {});
                 recordAsMap.put("intent", record.getIntent());
                 recordAsMap.put("recordType", record.getRecordType());
