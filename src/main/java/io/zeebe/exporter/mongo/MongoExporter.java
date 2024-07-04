@@ -51,17 +51,24 @@ public class MongoExporter implements Exporter {
         this.logger.debug("Record position: " + record.getPosition() + "\nRecord: " + record.toString());
         if (this.canBeExported(record, actualPosition)) {
             try {
-                String recordAsJson = this.exporterBuilder.writeValueAsString(record.getValue());
-                String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), record.getValue());
-                Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String, Object>>() {});
-                recordAsMap.put("intent", record.getIntent());
-                recordAsMap.put("recordType", record.getRecordType());
-                recordAsMap.put("valueType", record.getValueType());
-                recordAsMap.put("timestamp", record.getTimestamp());
-                recordAsMap.put("key", record.getKey());
-                recordAsMap.put("position", record.getPosition());
+                if (this.isRecordTimestampAllowedToBeExported(record)) {
+                    String recordAsJson = this.exporterBuilder.writeValueAsString(record.getValue());
+                    String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), record.getValue());
+                    Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String, Object>>() {
+                    });
+                    recordAsMap.put("intent", record.getIntent());
+                    recordAsMap.put("recordType", record.getRecordType());
+                    recordAsMap.put("valueType", record.getValueType());
+                    recordAsMap.put("timestamp", record.getTimestamp());
+                    recordAsMap.put("key", record.getKey());
+                    recordAsMap.put("position", record.getPosition());
 
-                this.exporterClient.insertRecord(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
+                    this.exporterClient.insertRecord(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
+                } else {
+                    this.logger.info(
+                        "Position: " + actualPosition + ":" + record.getTimestamp() + ", is before of " + this.exporterConfiguration.data.fromTimestamp + "!"
+                    );
+                }
                 this.controller.updateLastExportedRecordPosition(actualPosition);
                 this.lastPosition = actualPosition;
             } catch(JsonProcessingException e){
@@ -69,12 +76,15 @@ public class MongoExporter implements Exporter {
                 throw new RuntimeException(e);
             }
         } else {
-            this.logger.info("Position: " + actualPosition + ", was already exported!");
+            this.logger.info("Position: " + actualPosition + ":" + record.getTimestamp() + ", will not be exported!");
         }
     }
 
     private boolean canBeExported(Record<?> record, long actualPosition) {
         return this.lastPosition != actualPosition &&
-               this.exporterConfiguration.shouldExportRecord(record.getRecordType(), record.getValueType());
+            this.exporterConfiguration.shouldExportRecord(record.getRecordType(), record.getValueType());
+    }
+    private boolean isRecordTimestampAllowedToBeExported(Record<?> record) {
+        return record.getTimestamp() >= this.exporterConfiguration.data.fromTimestamp;
     }
 }
