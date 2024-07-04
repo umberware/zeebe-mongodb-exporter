@@ -75,6 +75,7 @@ public class MongoExporter implements Exporter {
 
     private boolean canBeExported(Record<?> record, long actualPosition) {
         return this.lastPosition != actualPosition &&
-               this.exporterConfiguration.shouldExportRecord(record.getRecordType(), record.getValueType());
+            this.exporterConfiguration.shouldExportRecord(record.getRecordType(), record.getValueType()) &&
+            record.getTimestamp() >= this.exporterConfiguration.data.fromTimestamp;
     }
 }

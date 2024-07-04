@@ -137,6 +137,7 @@ public class MongoExporterConfiguration {
         }
     }
     public static class DataConfiguration {
+        public Long fromTimestamp = 0L;
         public boolean decision = true;
         public boolean decisionEvaluation = true;
         public boolean decisionRequirements = true;
@@ -175,6 +176,8 @@ public class MongoExporterConfiguration {
                     + decision
                     + ", decisionEvaluation="
                     + decisionEvaluation
+                    + ", fromTimestamp="
+                    + fromTimestamp
                     + ", decisionRequirements="
                     + decisionRequirements
                     + ", deployment="
