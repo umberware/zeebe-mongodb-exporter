@@ -8,7 +8,9 @@ public class MongoExporterClient {
     public MongoExporterClient(MongoExporterConfiguration mongoDBConfiguration) {
         this.mongoDBConfiguration = mongoDBConfiguration;
     }
-    public void insertRecord(String collection, String record) {
+    public void
+
+    insertRecord(String collection, String record) {
         this.mongoDBConfiguration.mongoDatabase.getCollection(collection).insertOne(Document.parse(record));
     }
 }
