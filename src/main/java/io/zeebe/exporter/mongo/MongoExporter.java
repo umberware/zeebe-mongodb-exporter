@@ -51,9 +51,9 @@ public class MongoExporter implements Exporter {
         this.logger.debug("Record position: " + record.getPosition() + "\nRecord: " + record.toString());
         if (this.canBeExported(record, actualPosition)) {
             try {
-                if (this.isRecordTimestampAllowedToBeExported(record)) {
+                String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), record.getValue());
+                if (this.isRecordTimestampAllowedToBeExported(record) || this.isProcessDefinition(collection)) {
                     String recordAsJson = this.exporterBuilder.writeValueAsString(record.getValue());
-                    String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), record.getValue());
                     Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String, Object>>() {
                     });
                     recordAsMap.put("intent", record.getIntent());
@@ -64,10 +64,9 @@ public class MongoExporter implements Exporter {
                     recordAsMap.put("position", record.getPosition());
 
                     this.exporterClient.insertRecord(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
+                    this.logger.info("Exporting: " + actualPosition + ":" + record.getTimestamp() + " to collection: " + collection);
                 } else {
-                    this.logger.info(
-                        "Position: " + actualPosition + ":" + record.getTimestamp() + ", is before of " + this.exporterConfiguration.data.fromTimestamp + "!"
-                    );
+                    this.logger.info("Position: " + actualPosition + ":" + record.getTimestamp() + ", is before of " + this.exporterConfiguration.data.fromTimestamp + "!");
                 }
                 this.controller.updateLastExportedRecordPosition(actualPosition);
                 this.lastPosition = actualPosition;
@@ -86,5 +85,8 @@ public class MongoExporter implements Exporter {
     }
     private boolean isRecordTimestampAllowedToBeExported(Record<?> record) {
         return record.getTimestamp() >= this.exporterConfiguration.data.fromTimestamp;
+    }
+    private boolean isProcessDefinition(String collection) {
+        return collection.equals("process") || collection.equals("deployment");
     }
 }
