@@ -64,9 +64,9 @@ public class MongoExporter implements Exporter {
                     recordAsMap.put("position", record.getPosition());
 
                     this.exporterClient.insertRecord(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
-                    this.logger.info("Exporting: " + actualPosition + ":" + record.getTimestamp() + " to collection: " + collection);
+                    this.logger.debug("Exporting: " + actualPosition + ":" + record.getTimestamp() + " to collection: " + collection);
                 } else {
-                    this.logger.info("Position: " + actualPosition + ":" + record.getTimestamp() + ", is before of " + this.exporterConfiguration.data.fromTimestamp + "!");
+                    this.logger.debug("Position: " + actualPosition + ":" + record.getTimestamp() + ", is before of " + this.exporterConfiguration.data.fromTimestamp + "!");
                 }
                 this.controller.updateLastExportedRecordPosition(actualPosition);
                 this.lastPosition = actualPosition;
