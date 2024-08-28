@@ -64,7 +64,7 @@ public class MongoExporterUnitTest {
         verify(this.exporterConfiguration).shouldExportEventType(record.getValueType());
         verify(this.exporterConfiguration).shouldExportRecordType(record.getRecordType());
         verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), any());
-        verify(this.exporterClient).insertRecord("process-instance-creation", mapper.writeValueAsString(recordAsMap));
+        verify(this.exporterClient).updateOrInsert("process-instance-creation", mapper.writeValueAsString(recordAsMap));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class MongoExporterUnitTest {
         verify(this.exporterConfiguration).shouldExportEventType(record.getValueType());
         verify(this.exporterConfiguration).shouldExportRecordType(record.getRecordType());
         verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), eq(recordValue));
-        verify(this.exporterClient).insertRecord("process-instance", mapper.writeValueAsString(recordAsMap));
+        verify(this.exporterClient).updateOrInsert("process-instance", mapper.writeValueAsString(recordAsMap));
         verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), eq(recordValue));
         assertEquals("process-instance", this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), recordValue));
     }
@@ -112,7 +112,7 @@ public class MongoExporterUnitTest {
         verify(this.exporterConfiguration).shouldExportEventType(record.getValueType());
         verify(this.exporterConfiguration).shouldExportRecordType(record.getRecordType());
         verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), eq(recordValue));
-        verify(this.exporterClient).insertRecord("process-instance-sequence-flow", mapper.writeValueAsString(recordAsMap));
+        verify(this.exporterClient).updateOrInsert("process-instance-sequence-flow", mapper.writeValueAsString(recordAsMap));
         verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), eq(recordValue));
         assertEquals("process-instance-sequence-flow", this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), recordValue));
     }
@@ -141,7 +141,7 @@ public class MongoExporterUnitTest {
         verify(this.exporterConfiguration).shouldExportEventType(record.getValueType());
         verify(this.exporterConfiguration).shouldExportRecordType(record.getRecordType());
         verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), eq(recordValue));
-        verify(this.exporterClient).insertRecord("process-instance-element", mapper.writeValueAsString(recordAsMap));
+        verify(this.exporterClient).updateOrInsert("process-instance-element", mapper.writeValueAsString(recordAsMap));
         verify(this.exporterConfiguration, times(1)).getCollectionNameByEvent(eq(record.getValueType()), eq(recordValue));
         assertEquals("process-instance-element", this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), recordValue));
     }
@@ -156,7 +156,7 @@ public class MongoExporterUnitTest {
         verify(this.exporterConfiguration).shouldExportEventType(record.getValueType());
         verify(this.exporterConfiguration).shouldExportRecordType(record.getRecordType());
         verify(this.exporterConfiguration, times(0)).getCollectionNameByEvent(eq(record.getValueType()), any(RecordValue.class));
-        verify(this.exporterClient, times(0)).insertRecord(anyString(), any());
+        verify(this.exporterClient, times(0)).updateOrInsert(anyString(), any());
     }
 
     protected ImmutableRecord<RecordValue> buildRecord(RecordValue recordValue, RecordType type, ValueType eventType, long position) {

@@ -54,7 +54,7 @@ public class MongoExporter implements Exporter {
                 String collection = this.exporterConfiguration.getCollectionNameByEvent(record.getValueType(), record.getValue());
                 if (this.isRecordTimestampAllowedToBeExported(record) || this.isProcessDefinition(collection)) {
                     String recordAsJson = this.exporterBuilder.writeValueAsString(record.getValue());
-                    Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<Map<String, Object>>() {
+                    Map<String, Object> recordAsMap = this.exporterBuilder.readValue(recordAsJson, new TypeReference<>() {
                     });
                     recordAsMap.put("intent", record.getIntent());
                     recordAsMap.put("recordType", record.getRecordType());
@@ -63,7 +63,7 @@ public class MongoExporter implements Exporter {
                     recordAsMap.put("key", record.getKey());
                     recordAsMap.put("position", record.getPosition());
 
-                    this.exporterClient.insertRecord(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
+                    this.exporterClient.updateOrInsert(collection, this.exporterBuilder.writeValueAsString(recordAsMap));
                     this.logger.debug("Exporting: " + actualPosition + ":" + record.getTimestamp() + " to collection: " + collection);
                 } else {
                     this.logger.debug("Position: " + actualPosition + ":" + record.getTimestamp() + ", is before of " + this.exporterConfiguration.data.fromTimestamp + "!");

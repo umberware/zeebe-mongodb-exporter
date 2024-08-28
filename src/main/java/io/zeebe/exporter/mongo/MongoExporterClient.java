@@ -1,5 +1,6 @@
 package io.zeebe.exporter.mongo;
 
+import com.mongodb.client.model.UpdateOptions;
 import org.bson.Document;
 
 public class MongoExporterClient {
@@ -10,7 +11,21 @@ public class MongoExporterClient {
     }
     public void
 
-    insertRecord(String collection, String record) {
-        this.mongoDBConfiguration.mongoDatabase.getCollection(collection).insertOne(Document.parse(record));
+    updateOrInsert(String collection, String record) {
+        Document parsedRecord = (Document.parse(record));
+        Document event = new Document();
+        event.append("timestamp", parsedRecord.get("timestamp"));
+        event.append("intent", parsedRecord.get("intent"));
+
+        parsedRecord.remove("timestamp");
+        parsedRecord.remove("intent");
+
+        Document filter = new Document("key", parsedRecord.get("key"));
+        Document updateOperation = new Document("$set", parsedRecord);
+        UpdateOptions options = new UpdateOptions().upsert(true);
+
+        updateOperation.append("$push", new Document("events", event));
+
+        this.mongoDBConfiguration.mongoDatabase.getCollection(collection).updateOne(filter, updateOperation, options);
     }
 }
